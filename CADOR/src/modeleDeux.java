@@ -231,7 +231,6 @@ public class modeleDeux {
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
-					System.out.println(7*(p+i)+6);
 					vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+6]);
 				}
 			}
