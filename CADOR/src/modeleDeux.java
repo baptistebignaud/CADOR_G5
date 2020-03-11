@@ -63,7 +63,15 @@ public class modeleDeux {
 		
 		// Données sur le nombre de dimanche devant être
 		// travaillés selon le type de contrat des employés
-		double[] nbDimancheTravailles = {1,1,1,0.75,0.75,0.6,0.6};
+		int[][] nbDimancheTravailles = {
+				{1,1},
+				{1,1},
+				{1,1},
+				{3,4},
+				{3,4},
+				{3,5},
+				{3,5}
+		};
 		
 		// Nombre maximal de créneaux travaillés sur une
 		// fenêtre glissante de 7j
@@ -203,6 +211,16 @@ public class modeleDeux {
 		}
 
 
+		// Contrainte 9
+		for (int k=0; k<nbAgents;k++){
+			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
+			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
+				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
+					vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+6]);
+				}
+			}
+			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
+		}
 
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
