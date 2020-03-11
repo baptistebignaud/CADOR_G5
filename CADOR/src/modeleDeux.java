@@ -58,6 +58,9 @@ public class modeleDeux {
 		// Renvoie le nombre de personnes à chaque type de contrat
 		int[] contrats = {6,1,3,1,0,0,0};
 		
+		// Temps de travail relatif à chaque type de contrat
+		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
+		
 		// Pourcentage de JCA souhaités par jour
 		double nbJCA = 0.2;
 		
@@ -200,7 +203,7 @@ public class modeleDeux {
 			}
 		}
 		
-		for (int p=0;p<(int)H/7;p++) {
+		for (int p=0;p<(int)(H/7);p++) {
 			for (int k=0; k<=nbAgents; k++) {
 				IntVar[] tabKron = new IntVar[14];
 				for (int i=0;i<14;i++) {
@@ -226,12 +229,26 @@ public class modeleDeux {
 
 		// Contrainte 9.2
 		for(int i=0; i<7;i++) {
-			IntVar[] tabKron = new IntVar[nbAgents];
+			IntVar[] tabkron = new IntVar[nbAgents];
 			for(int k=0; k<nbAgents; k++) {
 				ArrayList<Integer> Domaine = new ArrayList<Integer>();
 				Domaine.add(i);
-				tabKron[k] = kronecker(Domaine, contrat_agent[k]);
+				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
 			}
+			
+			model.sum(tabkron,"=",contrats[i]);
+		}
+		
+		// Contrainte 9.3
+		for(int k=0; k<nbAgents; k++) {
+			IntVar[] vars = new IntVar[H];
+			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4));
+			 for(int p=0; p<(int)(H/7)-1; p++) {
+				for(int j=7*p; j<7*p+6; j++) {
+					vars[j] = kronecker(Domaine, Plannifs[k][j]);
+				}
+			}
+			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()])));
 		}
 		
 		solver.findSolution();
