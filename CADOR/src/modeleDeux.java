@@ -56,6 +56,12 @@ public class modeleDeux {
 				{1,1,1,1,1,0,0},
 		};
 		
+		// Renvoie le nombre de personnes à chaque type de contrat
+		int[] contrats = {6,1,3,1,0,0,0};
+		
+		// Temps de travail relatif à chaque type de contrat
+		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
+		
 		// Pourcentage de JCA souhaités par jour
 		double nbJCA = 0.2;
 		
@@ -88,8 +94,8 @@ public class modeleDeux {
 		
 		
 		//Variables
-		IntVar[][] Plannifs=model.intVarMatrix("Plannification", nbAgents, H, 0,6);
-		
+		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,6);
+		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
 		//Contraintes
 		
@@ -198,7 +204,7 @@ public class modeleDeux {
 				model.sum(tabKron,">=",4).post();
 			}
 		}
-		
+
 		for (int p=0;p<(int)H/7-2;p++) {
 			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[12];
@@ -211,27 +217,37 @@ public class modeleDeux {
 				model.sum(tabKron,">=",4).post();
 			}
 		}
+		
+		// Contrainte 5.3.2
+		for (int j=0;j<H-1;j++) {
+			for (int k=0;k<nbAgents;k++) {
+				ArrayList<Integer> domaine = new ArrayList<Integer>();
+				domaine.add(5);
+				IntVar kron1 = kronecker(domaine,Plannifs[k][j]);
+				IntVar kron2 = kronecker(domaine,Plannifs[k][j+1]);
+				model.arithm(kron1,"*", kron2, "=", 0).post();;
+			}
+		}
+		
 
-
-		// Contrainte 9
+		// Contrainte 9.1
+		
 		for (int k=0; k<nbAgents;k++){
 			System.out.println(2*nbDimancheTravailles[k][1]);
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
+
 					System.out.println("k="+k);
 					System.out.println("p="+p);
 					System.out.println("i="+i);
 					//System.out.println(Plannifs[k][5]);
 					System.out.printf("end");
 					//vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+5]);
-
-
 				}
 			}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
 		}
-
 
 		//Contrainte 10
 		for (int j=0; j<H; j++){
@@ -247,6 +263,33 @@ public class modeleDeux {
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
 
 		}
+
+
+		
+		// Contrainte 9.2
+		for(int i=0; i<7;i++) {
+			IntVar[] tabkron = new IntVar[nbAgents];
+			for(int k=0; k<nbAgents; k++) {
+				ArrayList<Integer> Domaine = new ArrayList<Integer>();
+				Domaine.add(i);
+				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
+			}
+			
+			model.sum(tabkron,"=",contrats[i]);
+		}
+		
+		// Contrainte 9.3
+		for(int k=0; k<nbAgents; k++) {
+			IntVar[] vars = new IntVar[H];
+			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4));
+			 for(int p=0; p<(int)(H/7)-1; p++) {
+				for(int j=7*p; j<7*p+6; j++) {
+					vars[j] = kronecker(Domaine, Plannifs[k][j]);
+				}
+			}
+			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()])));
+		}
+		
 
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
