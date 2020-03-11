@@ -7,6 +7,7 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.ArrayUtils;
 
 public class modeleDeux {
 	static Model model = new Model("modele2");
@@ -36,13 +37,13 @@ public class modeleDeux {
 	
 		
 	public static void main(String[] args) {
-		int[] horizons= {1,2,3};
+		int[] horizons= {1,2,3,4};
 		
 		//Paramètres
 		
 		// Horizon sur lequel on souhaite planifier
 		//int H = horizon(horizons);
-		int H=6;
+		int H=7*5;
 		int nbAgents=10;
 		
 		// Données fournies sur les besoins en personnel
@@ -95,7 +96,7 @@ public class modeleDeux {
 		//Contrainte 3.2
 		
 		for (int p=0;p<(int)(H/7);p++) {
-			for (int k=0; k<=nbAgents; k++) {
+			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[7];
 				for (int i=0;i<7;i++) {
 					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][7*p+i]);
@@ -108,7 +109,7 @@ public class modeleDeux {
 		
 		//Contrainte 4.1
 			for (int p=0;p<(int)(H-6);p++) {
-				for (int k=0; k<=nbAgents; k++) {
+				for (int k=0; k<nbAgents; k++) {
 					IntVar[] tabKron= new IntVar[7];
 					for (int i=0;i<7;i++) {
 						tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
@@ -136,7 +137,7 @@ public class modeleDeux {
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
 			for (int p=0; p<H/7; p++) {
-				for (int j=7*p; j<7*p+6;j++){
+				for (int j=7*p; j<7*p+4;j++){
 					IntVar[][] tabKron = new IntVar[5][3];
 					tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
 					tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2, 3, 5)), Plannifs[k][j + 1]);
@@ -187,22 +188,23 @@ public class modeleDeux {
 
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
-			for (int k=0; k<=nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[14];
-				for (int i=0;i<14;i++) {
+			for (int k=0; k<nbAgents; k++) {
+				IntVar[] tabKron= new IntVar[13];
+				for (int i=0;i<13;i++) {
 					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*p+i]);
 				}
+
 				
 				model.sum(tabKron,">=",4).post();
 			}
 		}
 		
-		for (int p=0;p<(int)H/7;p++) {
-			for (int k=0; k<=nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[14];
-				for (int i=0;i<14;i++) {
+		for (int p=0;p<(int)H/7-2;p++) {
+			for (int k=0; k<nbAgents; k++) {
+				IntVar[] tabKron= new IntVar[12];
+				for (int i=0;i<12;i++) {
 					ArrayList<Integer> Domaine = new ArrayList<Integer>();
-					Domaine.add(6);
+					Domaine.add(5);
 					tabKron[i]=kronecker(Domaine, Plannifs[k][7*p+i]);
 				}
 				
@@ -213,13 +215,37 @@ public class modeleDeux {
 
 		// Contrainte 9
 		for (int k=0; k<nbAgents;k++){
+			System.out.println(2*nbDimancheTravailles[k][1]);
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
-					vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+6]);
+					System.out.println("k="+k);
+					System.out.println("p="+p);
+					System.out.println("i="+i);
+					//System.out.println(Plannifs[k][5]);
+					System.out.printf("end");
+					//vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+5]);
+
+
 				}
 			}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
+		}
+
+
+		//Contrainte 10
+		for (int j=0; j<H; j++){
+			IntVar[] occurence = new IntVar[4];
+			occurence[0] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[1] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[2] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[3] = model.intVar("occurence", 0, nbAgents,true);
+			model.globalCardinality(Plannifs[j], new int[]{0,1,2,3},occurence, false).post();
+			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
+			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
+			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
+			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
+
 		}
 
 		solver.findSolution();
