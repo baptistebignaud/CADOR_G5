@@ -127,38 +127,52 @@ public class modeleDeux {
 			
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
-			for (int j=0; j<H-1; j++){
-				IntVar[][] tabKron = new IntVar[6][2];
-				tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
-				tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2,3,5)), Plannifs[k][j+1]);
+			for (int p=0; p<H/7; p++) {
+				for (int j=7*p; j<7*p+6;j++){
+					IntVar[][] tabKron = new IntVar[5][3];
+					tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
+					tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2, 3, 5)), Plannifs[k][j + 1]);
 
-				tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j]);
-				tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(3,5)), Plannifs[k][j+1]);
+					tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j]);
+					tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(3, 5)), Plannifs[k][j + 1]);
 
-				tabKron[2][0] = kronecker(new ArrayList<Integer>(Arrays.asList(1)), Plannifs[k][j]);
-				tabKron[2][2] = kronecker(new ArrayList<Integer>(Arrays.asList(3,5)), Plannifs[k][j+1])
+					tabKron[2][0] = kronecker(new ArrayList<Integer>(Arrays.asList(1)), Plannifs[k][j]);
+					tabKron[2][2] = kronecker(new ArrayList<Integer>(Arrays.asList(3, 5)), Plannifs[k][j + 1]);
 
-				tabKron[3][0] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
-				tabKron[3][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j+1]);
-				tabKron[3][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0,5)), Plannifs[k][j+2]);
+					tabKron[3][0] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
+					tabKron[3][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j + 1]);
+					tabKron[3][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0, 5)), Plannifs[k][j + 2]);
 
-				tabKron[4][0] = kronecker(new ArrayList<Integer>(Arrays.asList(3)), Plannifs[k][j]);
-				tabKron[4][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j+1]);
-				tabKron[4][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0,1,5)), Plannifs[k][j+2]);
+					tabKron[4][0] = kronecker(new ArrayList<Integer>(Arrays.asList(3)), Plannifs[k][j]);
+					tabKron[4][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j + 1]);
+					tabKron[4][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0, 1, 5)), Plannifs[k][j + 2]);
 
-				IntVar var0 = model.intVar(0,1,true);
-				model.arithm(tabKron[0][0],"+", tabKron[0][1],"=",var0).post();
+					IntVar[] vars = new IntVar[5];
 
-				IntVar var1 = model.intVar(0,1,true);
-				model.arithm(tabKron[1][0],"+", tabKron[1][1],"=",var1).post();
+					vars[0] = model.intVar(0, 1, true);
+					model.arithm(tabKron[0][0], "*", tabKron[0][1], "=", vars[0]).post();
 
-				IntVar var2 = model.intVar(0,1,true);
-				model.arithm(tabKron[2][0],"+", tabKron[2][2],"=",var2).post();
+					vars[1] = model.intVar(0, 1, true);
+					model.arithm(tabKron[1][0], "*", tabKron[1][1], "=", vars[1]).post();
+
+					vars[2] = model.intVar(0, 1, true);
+					model.arithm(tabKron[2][0], "*", tabKron[2][2], "=", vars[2]).post();
+
+					IntVar var33 = model.intVar(0, 1, true);
+					model.arithm(tabKron[3][1], "+", tabKron[3][2], "=", var33).post();
+					vars[3] = model.intVar(0, 1, true);
+					model.arithm(tabKron[3][0], "*", var33, "=", vars[3]).post();
 
 
+					IntVar var44 = model.intVar(0, 1, true);
+					model.arithm(tabKron[4][1], "+", tabKron[4][2], "=", var44).post();
+					vars[4] = model.intVar(0, 1, true);
+					model.arithm(tabKron[4][0], "*", var33, "=", vars[4]).post();
+
+					model.sum(vars, ">=", 1).post();
 
 
-
+				}
 			}
 
 		}
