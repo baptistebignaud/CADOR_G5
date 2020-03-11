@@ -212,18 +212,32 @@ public class modeleDeux {
 				model.sum(tabKron,">=",4).post();
 			}
 		}
+		
+		// Contrainte 5.3.2
+		for (int j=0;j<H-1;j++) {
+			for (int k=0;k<nbAgents;k++) {
+				ArrayList<Integer> domaine = new ArrayList<Integer>();
+				domaine.add(5);
+				IntVar kron1 = kronecker(domaine,Plannifs[k][j]);
+				IntVar kron2 = kronecker(domaine,Plannifs[k][j+1]);
+				model.arithm(kron1,"*", kron2, "=", 0).post();;
+			}
+		}
+		
 
 		// Contrainte 9.1
+		
 		for (int k=0; k<nbAgents;k++){
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
+					System.out.println(7*(p+i)+6);
 					vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+6]);
 				}
 			}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
 		}
-
+		
 		// Contrainte 9.2
 		for(int i=0; i<7;i++) {
 			IntVar[] tabKron = new IntVar[nbAgents];
