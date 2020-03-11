@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
 
@@ -40,7 +41,8 @@ public class modeleDeux {
 		//Paramètres
 		
 		// Horizon sur lequel on souhaite planifier
-		int H = horizon(horizons);
+		//int H = horizon(horizons);
+		int H=6;
 		int nbAgents=10;
 		
 		// Données fournies sur les besoins en personnel
@@ -117,13 +119,50 @@ public class modeleDeux {
 				tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0,1)), Plannifs[k][j+1]);
 				tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
 				tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j+1]);
-				
-				// model produit tabKron[0][0]*tabKron[0][1] == 0
-				// model produit tabKron[1][0]*tabKron[1][1] == 0
+
+				model.arithm(tabKron[0][0],"*",tabKron[0][1],"=",0 ).post();
+				model.arithm(tabKron[1][0],"*",tabKron[1][1],"=",0 ).post();
 			}
 		}
 			
-			
+		//Contrainte 4.3
+		for (int k=0; k<nbAgents; k++){
+			for (int j=0; j<H-1; j++){
+				IntVar[][] tabKron = new IntVar[6][2];
+				tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
+				tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2,3,5)), Plannifs[k][j+1]);
+
+				tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j]);
+				tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(3,5)), Plannifs[k][j+1]);
+
+				tabKron[2][0] = kronecker(new ArrayList<Integer>(Arrays.asList(1)), Plannifs[k][j]);
+				tabKron[2][2] = kronecker(new ArrayList<Integer>(Arrays.asList(3,5)), Plannifs[k][j+1])
+
+				tabKron[3][0] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
+				tabKron[3][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j+1]);
+				tabKron[3][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0,5)), Plannifs[k][j+2]);
+
+				tabKron[4][0] = kronecker(new ArrayList<Integer>(Arrays.asList(3)), Plannifs[k][j]);
+				tabKron[4][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j+1]);
+				tabKron[4][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0,1,5)), Plannifs[k][j+2]);
+
+				IntVar var0 = model.intVar(0,1,true);
+				model.arithm(tabKron[0][0],"+", tabKron[0][1],"=",var0).post();
+
+				IntVar var1 = model.intVar(0,1,true);
+				model.arithm(tabKron[1][0],"+", tabKron[1][1],"=",var1).post();
+
+				IntVar var2 = model.intVar(0,1,true);
+				model.arithm(tabKron[2][0],"+", tabKron[2][2],"=",var2).post();
+
+
+
+
+
+			}
+
+		}
+
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
 			for (int k=0; k<=nbAgents; k++) {
@@ -148,8 +187,19 @@ public class modeleDeux {
 				model.sum(tabKron,">=",4).post();
 			}
 		}
-		
-		
+
+
+
+		solver.findSolution();
+		//Solution mySolution = model.getSolver().findSolution();
+		for (int i=0; i<nbAgents; i++){
+			for (int j=0; j<H; j++){
+				System.out.print(Plannifs[i][j].getValue()+"  ");
+			}
+			System.out.println();
+		}
+		solver.showStatistics();
+
 		
 		
 	}
