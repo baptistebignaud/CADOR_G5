@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 
 public class modeleDeux {
@@ -50,18 +51,21 @@ public class modeleDeux {
 		}
 		int[] Dtab = new int[D.size()];
 		int index =0;
+
 		for (int num : D) {
 			Dtab[index]=num;
 			index++;
 		}
-
+		
 		for (int i=0;i<Dtab.length;i++) {
 			Dprime[Dtab[i]-1]=1;
 		}
 		int res = 0;
+		
 		for (int k=0; k<Dprime.length;k++) {
 			res+=(int)Math.pow(5, Dprime[k]);
 		}
+		
 		return res;
 	}
 	
@@ -71,6 +75,14 @@ public class modeleDeux {
 		for (int num : set) {
 			res[index]=num;
 			index++;
+		}
+		return res;
+	}
+	
+	public static Set<Integer> tabToSet(ArrayList<Integer> tab){
+		Set<Integer> res = new TreeSet<Integer>();
+		for (int value : tab) {
+			res.add(value);
 		}
 		return res;
 	}
@@ -138,12 +150,19 @@ public class modeleDeux {
 		
 		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
 		for(int i=0; i<nbAgents;i++) {
-			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,120);
+			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,32);
 		}
 
 		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
-
+		
+		for(int k=0; k<nbAgents; k++) {
+			for (int j=0; j<H; j++) {
+				for (Set<Integer> sousEnsemble : ensembleD) {
+					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
+				}
+			}
+		}
 		/*
 		//Contraintes
 		
@@ -263,18 +282,16 @@ public class modeleDeux {
 				model.sum(tabKron,">=",4).post();
 			}
 		}
-		
+		*/
 		// Contrainte 5.3.2
 		for (int j=0;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
 				ArrayList<Integer> domaine = new ArrayList<Integer>();
 				domaine.add(5);
-				IntVar kron1 = kronecker(domaine,Plannifs[k][j]);
-				IntVar kron2 = kronecker(domaine,Plannifs[k][j+1]);
-				model.arithm(kron1,"*", kron2, "=", 0).post();;
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(domaine))],"*", DeltaPlannifD[k][j+1][indexage(tabToSet(domaine))], "=", 0).post();;
 			}
 		}
-		
+		/*
 		// Contrainte 9.1
 		/*
 		for (int k=0; k<nbAgents;k++){
@@ -296,19 +313,26 @@ public class modeleDeux {
 		}*/
 
 		//Contrainte 10
+		/*
 		for (int j=0; j<H; j++){
+			/*
 			IntVar[] occurence = new IntVar[4];
-			occurence[0] = model.intVar("occurence", 0, nbAgents,true);
-			occurence[1] = model.intVar("occurence", 0, nbAgents,true);
-			occurence[2] = model.intVar("occurence", 0, nbAgents,true);
-			occurence[3] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
+			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
+			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
+			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
+			*//*  
+			IntVar[] occurence = new IntVar[4];
+			System.out.println(ArrayUtils.getColumn(Plannifs,j)[1]);
+			// PROBLEME : on compte le nombre d'occurences de valeurs dans des variables pas encore instanciées ??
 			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
 			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
 			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
 			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
-
+			System.out.println(occurence[0]);
 		}
+		
 		/*
 		// Contrainte 9.2
 		for(int i=0; i<7;i++) {
@@ -336,16 +360,9 @@ public class modeleDeux {
 
 		}
 		*/
-		for(int k=0; k<nbAgents; k++) {
-			for (int j=0; j<H; j++) {
-				for (Set<Integer> sousEnsemble : ensembleD) {
-					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
-				}
-			}
-
-		}
 		
 		solver.findSolution();
+		System.out.println("arrive la");
 		//Solution mySolution = model.getSolver().findSolution();
 		for (int i=0; i<nbAgents; i++){
 			for (int j=0; j<H; j++){
