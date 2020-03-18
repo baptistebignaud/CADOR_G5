@@ -29,15 +29,15 @@ public class modeleDeux {
 	public static final List<Integer> creneaux = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4,5));
 	
 	public static IntVar kronecker(ArrayList<Integer> integer,IntVar Plannif) {
-		IntVar kroneck=model.intVar("kroneck",0,1,true);
-		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1);
+		IntVar kroneck = model.intVar("kroneck",0,1,true);
+		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1) ;
 		else model.arithm(kroneck, "=", 0);
 	return kroneck;	
 	}
 	
 		
 	public static void main(String[] args) {
-		int[] horizons= {1,2,3,4};
+		int[] horizons = {1,2,3,4};
 		
 		//Paramètres
 		
@@ -114,16 +114,16 @@ public class modeleDeux {
 		
 		
 		//Contrainte 4.1
-			for (int p=0;p<(int)(H-6);p++) {
-				for (int k=0; k<nbAgents; k++) {
-					IntVar[] tabKron= new IntVar[7];
-					for (int i=0;i<7;i++) {
-						tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
-					}
-						
-					model.sum(tabKron,"<=",8).post();//
+		/*for (int p=0;p<(int)(H-6);p++) {
+			for (int k=0; k<nbAgents; k++) {
+				IntVar[] tabKron= new IntVar[7];
+				for (int i=0;i<7;i++) {
+					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
 				}
+						
+				model.sum(tabKron,"<=",8).post();//
 			}
+		}
 				
 		// Contrainte 4.2
 			
@@ -227,27 +227,28 @@ public class modeleDeux {
 				IntVar kron2 = kronecker(domaine,Plannifs[k][j+1]);
 				model.arithm(kron1,"*", kron2, "=", 0).post();;
 			}
-		}
+		}*/
 		
 
 		// Contrainte 9.1
-		
+		/*
 		for (int k=0; k<nbAgents;k++){
 			System.out.println(2*nbDimancheTravailles[k][1]);
-			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
+			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
 
 					System.out.println("k="+k);
 					System.out.println("p="+p);
 					System.out.println("i="+i);
-					//System.out.println(Plannifs[k][5]);
+					System.out.println(7*(p+i)+5);
+					System.out.println(Plannifs[k][7*(p+i)+5]);
 					System.out.printf("end");
 					//vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+5]);
 				}
 			}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
-		}
+		}*/
 
 		//Contrainte 10
 		for (int j=0; j<H; j++){
@@ -256,7 +257,7 @@ public class modeleDeux {
 			occurence[1] = model.intVar("occurence", 0, nbAgents,true);
 			occurence[2] = model.intVar("occurence", 0, nbAgents,true);
 			occurence[3] = model.intVar("occurence", 0, nbAgents,true);
-			model.globalCardinality(Plannifs[j], new int[]{0,1,2,3},occurence, false).post();
+			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
 			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
 			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
 			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
@@ -267,7 +268,7 @@ public class modeleDeux {
 
 		
 		// Contrainte 9.2
-		for(int i=0; i<7;i++) {
+		/*for(int i=0; i<7;i++) {
 			IntVar[] tabkron = new IntVar[nbAgents];
 			for(int k=0; k<nbAgents; k++) {
 				ArrayList<Integer> Domaine = new ArrayList<Integer>();
@@ -282,14 +283,15 @@ public class modeleDeux {
 		for(int k=0; k<nbAgents; k++) {
 			IntVar[] vars = new IntVar[H];
 			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4));
-			 for(int p=0; p<(int)(H/7)-1; p++) {
-				for(int j=7*p; j<7*p+6; j++) {
+			 for(int p=0; p<(int)(H/7); p++) {
+				for(int j=7*p; j<7*p+7; j++) {
 					vars[j] = kronecker(Domaine, Plannifs[k][j]);
+
 				}
 			}
 			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
 		}
-		
+		*/
 
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
