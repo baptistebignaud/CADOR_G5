@@ -333,6 +333,7 @@ public class modeleDeux {
 				}
 			}
 			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
+
 		}
 		*/
 		for(int k=0; k<nbAgents; k++) {
@@ -341,6 +342,7 @@ public class modeleDeux {
 					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
 				}
 			}
+
 		}
 		
 		solver.findSolution();
