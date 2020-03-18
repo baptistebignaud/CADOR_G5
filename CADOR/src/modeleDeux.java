@@ -6,7 +6,15 @@ import java.util.List;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.ArrayUtils;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 
 public class modeleDeux {
 	static Model model = new Model("modele2");
@@ -29,20 +37,52 @@ public class modeleDeux {
 	
 	public static IntVar kronecker(ArrayList<Integer> integer,IntVar Plannif) {
 		IntVar kroneck=model.intVar("kroneck",0,1,true);
-		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1);
+		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1) ;
 		else model.arithm(kroneck, "=", 0);
-	return kroneck;	
+		return kroneck;	
 	}
 	
+	public static int indexage(Set<Integer> D) {
 		
+		int[] Dprime = new int[5];
+		for (int j=0;j<Dprime.length;j++) {
+			Dprime[j]=0;
+		}
+		int[] Dtab = new int[D.size()];
+		int index =0;
+		for (int num : D) {
+			Dtab[index]=num;
+			index++;
+		}
+
+		for (int i=0;i<Dtab.length;i++) {
+			Dprime[Dtab[i]-1]=1;
+		}
+		int res = 0;
+		for (int k=0; k<Dprime.length;k++) {
+			res+=(int)Math.pow(5, Dprime[k]);
+		}
+		return res;
+	}
+	
+	public static int[] setToTab(Set<Integer> set ) {
+		int[] res = new int[set.size()];
+		int index =0;
+		for (int num : set) {
+			res[index]=num;
+			index++;
+		}
+		return res;
+	}
+	
 	public static void main(String[] args) {
-		int[] horizons= {1,2,3};
+		int[] horizons= {1,2,3,4};
 		
 		//Paramètres
 		
 		// Horizon sur lequel on souhaite planifier
 		//int H = horizon(horizons);
-		int H=6;
+		int H=7*5;
 		int nbAgents=10;
 		
 		// Données fournies sur les besoins en personnel
@@ -57,6 +97,9 @@ public class modeleDeux {
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
 		int[] contrats = {6,1,3,1,0,0,0};
+		
+		// Temps de travail relatif à chaque type de contrat
+		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
 		
 		// Pourcentage de JCA souhaités par jour
 		double nbJCA = 0.2;
@@ -93,12 +136,21 @@ public class modeleDeux {
 		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,6);
 		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
+		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
+		for(int i=0; i<nbAgents;i++) {
+			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,120);
+		}
+
+		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
+		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
+
+		/*
 		//Contraintes
 		
 		//Contrainte 3.2
 		
 		for (int p=0;p<(int)(H/7);p++) {
-			for (int k=0; k<=nbAgents; k++) {
+			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[7];
 				for (int i=0;i<7;i++) {
 					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][7*p+i]);
@@ -111,7 +163,7 @@ public class modeleDeux {
 		
 		//Contrainte 4.1
 			for (int p=0;p<(int)(H-6);p++) {
-				for (int k=0; k<=nbAgents; k++) {
+				for (int k=0; k<nbAgents; k++) {
 					IntVar[] tabKron= new IntVar[7];
 					for (int i=0;i<7;i++) {
 						tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
@@ -139,7 +191,7 @@ public class modeleDeux {
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
 			for (int p=0; p<H/7; p++) {
-				for (int j=7*p; j<7*p+6;j++){
+				for (int j=7*p; j<7*p+4;j++){
 					IntVar[][] tabKron = new IntVar[5][3];
 					tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
 					tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2, 3, 5)), Plannifs[k][j + 1]);
@@ -182,31 +234,30 @@ public class modeleDeux {
 
 					model.sum(vars, ">=", 1).post();
 
-
 				}
 			}
-
 		}
 
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
-			for (int k=0; k<=nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[14];
-				for (int i=0;i<14;i++) {
+			for (int k=0; k<nbAgents; k++) {
+				IntVar[] tabKron= new IntVar[13];
+				for (int i=0;i<13;i++) {
 					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*p+i]);
 				}
+
 				
 				model.sum(tabKron,">=",4).post();
 			}
 		}
-		
-		for (int p=0;p<(int)H/7;p++) {
-			for (int k=0; k<=nbAgents; k++) {
-				IntVar[] tabKron = new IntVar[14];
-				for (int i=0;i<14;i++) {
+
+		for (int p=0;p<(int)H/7-2;p++) {
+			for (int k=0; k<nbAgents; k++) {
+				IntVar[] tabKron= new IntVar[12];
+				for (int i=0;i<12;i++) {
 					ArrayList<Integer> Domaine = new ArrayList<Integer>();
-					Domaine.add(6);
-					tabKron[i] = kronecker(Domaine, Plannifs[k][7*p+i]);
+					Domaine.add(5);
+					tabKron[i]=kronecker(Domaine, Plannifs[k][7*p+i]);
 				}
 				
 				model.sum(tabKron,">=",4).post();
@@ -224,26 +275,71 @@ public class modeleDeux {
 			}
 		}
 		
-
 		// Contrainte 9.1
-		
+		/*
 		for (int k=0; k<nbAgents;k++){
-			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]];
+			System.out.println(2*nbDimancheTravailles[k][1]);
+			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
-					vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+6]);
+
+					System.out.println("k="+k);
+					System.out.println("p="+p);
+					System.out.println("i="+i);
+					System.out.println(7*(p+i)+5);
+					System.out.println(Plannifs[k][7*(p+i)+5]);
+					System.out.printf("end");
+					//vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+5]);
 				}
 			}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
+		}*/
+
+		//Contrainte 10
+		for (int j=0; j<H; j++){
+			IntVar[] occurence = new IntVar[4];
+			occurence[0] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[1] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[2] = model.intVar("occurence", 0, nbAgents,true);
+			occurence[3] = model.intVar("occurence", 0, nbAgents,true);
+			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
+			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
+			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
+			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
+			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
+
 		}
-		
+		/*
 		// Contrainte 9.2
 		for(int i=0; i<7;i++) {
-			IntVar[] tabKron = new IntVar[nbAgents];
+			IntVar[] tabkron = new IntVar[nbAgents];
 			for(int k=0; k<nbAgents; k++) {
 				ArrayList<Integer> Domaine = new ArrayList<Integer>();
 				Domaine.add(i);
-				tabKron[k] = kronecker(Domaine, contrat_agent[k]);
+				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
+			}
+			
+			model.sum(tabkron,"=",contrats[i]).post();
+		}
+		
+		// Contrainte 9.3
+		for(int k=0; k<nbAgents; k++) {
+			IntVar[] vars = new IntVar[H];
+			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4));
+			 for(int p=0; p<(int)(H/7); p++) {
+				for(int j=7*p; j<7*p+7; j++) {
+					vars[j] = kronecker(Domaine, Plannifs[k][j]);
+
+				}
+			}
+			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
+		}
+		*/
+		for(int k=0; k<nbAgents; k++) {
+			for (int j=0; j<H; j++) {
+				for (Set<Integer> sousEnsemble : ensembleD) {
+					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
+				}
 			}
 		}
 		
@@ -256,10 +352,5 @@ public class modeleDeux {
 			System.out.println();
 		}
 		solver.showStatistics();
-
-		
-		
 	}
-	
-
 }
