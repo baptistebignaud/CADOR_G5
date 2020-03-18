@@ -275,7 +275,7 @@ public class modeleDeux {
 				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
 			}
 			
-			model.sum(tabkron,"=",contrats[i]);
+			model.sum(tabkron,"=",contrats[i]).post();
 		}
 		
 		// Contrainte 9.3
@@ -287,7 +287,7 @@ public class modeleDeux {
 					vars[j] = kronecker(Domaine, Plannifs[k][j]);
 				}
 			}
-			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()])));
+			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
 		}
 		
 
