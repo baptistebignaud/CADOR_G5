@@ -45,7 +45,7 @@ public class modeleDeux {
 	
 	public static int indexage(Set<Integer> D) {
 		
-		int[] Dprime = new int[5];
+		int[] Dprime = new int[6];
 		for (int j=0;j<Dprime.length;j++) {
 			Dprime[j]=0;
 		}
@@ -58,12 +58,12 @@ public class modeleDeux {
 		}
 		
 		for (int i=0;i<Dtab.length;i++) {
-			Dprime[Dtab[i]-1]=1;
+			Dprime[Dtab[i]]=1;
 		}
 		int res = 0;
 		
 		for (int k=0; k<Dprime.length;k++) {
-			res+=(int)Math.pow(5, Dprime[k]);
+			res+=(int)Math.pow(6, Dprime[k]);
 		}
 		
 		return res;
@@ -155,6 +155,7 @@ public class modeleDeux {
 
 		Set<Integer> ints = ImmutableSet.of(0, 1, 2, 3, 4, 5);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
+		System.out.println(ensembleD);
 		
 		for(int k=0; k<nbAgents; k++) {
 			for (int j=0; j<H; j++) {
@@ -363,14 +364,6 @@ public class modeleDeux {
 		}
 		*/
 
-		for(int k=0; k<nbAgents; k++) {
-			for (int j=0; j<H; j++) {
-				for (Set<Integer> sousEnsemble : ensembleD) {
-					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
-				}
-			}
-
-		}
 		
 		solver.findSolution();
 		System.out.println("arrive la");
