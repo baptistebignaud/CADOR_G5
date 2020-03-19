@@ -155,7 +155,6 @@ public class modeleDeux {
 
 		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
-		System.out.println(ensembleD);
 		
 		for(int k=0; k<nbAgents; k++) {
 			for (int j=0; j<H; j++) {
@@ -316,16 +315,14 @@ public class modeleDeux {
 		}*/
 
 		//Contrainte 10
-		/*
+
 		for (int j=0; j<H; j++){
-			/*
+			
 			IntVar[] occurence = new IntVar[4];
 			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
 			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
 			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
 			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
-			*//*  
-			IntVar[] occurence = new IntVar[4];
 			System.out.println(ArrayUtils.getColumn(Plannifs,j)[1]);
 			// PROBLEME : on compte le nombre d'occurences de valeurs dans des variables pas encore instanciées ??
 			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
