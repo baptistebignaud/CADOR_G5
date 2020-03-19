@@ -153,7 +153,7 @@ public class modeleDeux {
 			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,32);
 		}
 
-		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
+		Set<Integer> ints = ImmutableSet.of(0, 1, 2, 3, 4, 5);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
 		
 		for(int k=0; k<nbAgents; k++) {
