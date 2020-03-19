@@ -33,40 +33,84 @@ public class modeleDeux {
 	// 2 : Soir
 	// 3 : Nuit
 	// 4 : Vide
-	// JCA à part
+	
 	public static final List<Integer> creneaux = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4,5));
 	
 	public static IntVar kronecker(ArrayList<Integer> integer,IntVar Plannif) {
-		IntVar kroneck = model.intVar("kroneck",0,1,true);
+		IntVar kroneck=model.intVar("kroneck",0,1,true);
 		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1) ;
 		else model.arithm(kroneck, "=", 0);
 		return kroneck;	
 	}
 	
+	
 	public static int indexage(Set<Integer> D) {
-		
-		int[] Dprime = new int[5];
-		for (int j=0;j<Dprime.length;j++) {
-			Dprime[j]=0;
-		}
-		int[] Dtab = new int[D.size()];
-		int index =0;
 
-		for (int num : D) {
-			Dtab[index]=num;
-			index++;
+		if (D.contains(0) && D.contains(1) && D.contains(2) && D.contains(3) && D.contains(4)) {
+			return 31;
+		} else if (D.contains(1) && D.contains(2) && D.contains(3) && D.contains(4)){
+			return 30;
+		} else if (D.contains(0) && D.contains(2) && D.contains(3) && D.contains(4)) {
+			return 29;
+		} else if (D.contains(2) && D.contains(3) && D.contains(4)) {
+			return 28;
+		} else if (D.contains(0) && D.contains(1) && D.contains(3) && D.contains(4)) {
+			return 27;
+		} else if (D.contains(1) && D.contains(3) && D.contains(4)) {
+			return 26;
+		} else if (D.contains(0) && D.contains(3) && D.contains(4)) {
+			return 25;
+		} else if (D.contains(3) && D.contains(4)) {
+			return 24;
+		} else if (D.contains(0) && D.contains(1) && D.contains(2) && D.contains(4)) {
+			return 23;
+		} else if (D.contains(1) && D.contains(2) && D.contains(4)) {
+			return 22;
+		} else if (D.contains(0) && D.contains(2) && D.contains(4)) {
+			return 21;
+		} else if (D.contains(2) && D.contains(4)) {
+			return 20;
+		} else if (D.contains(0) && D.contains(1) && D.contains(4)) {
+			return 19;
+		} else if (D.contains(1) && D.contains(4)) {
+			return 18;
+		} else if (D.contains(0) && D.contains(4)) {
+			return 17;
+		} else if (D.contains(4)) {
+			return 16;
+		} else if (D.contains(0) && D.contains(1) && D.contains(2) && D.contains(3)) {
+			return 15;
+		} else if (D.contains(1) && D.contains(2) && D.contains(3)) {
+			return 14;
+		} else if (D.contains(0) && D.contains(2) && D.contains(3)) {
+			return 13;
+		} else if (D.contains(2) && D.contains(3)) {
+			return 12;
+		} else if (D.contains(0) && D.contains(1) && D.contains(3)) {
+			return 11;
+		} else if (D.contains(1) && D.contains(3)) {
+			return 10;
+		} else if (D.contains(0) && D.contains(3)) {
+			return 9;
+		} else if (D.contains(3)) {
+			return 8;
+		} else if (D.contains(0) && D.contains(1) && D.contains(2)) {
+			return 7;
+		} else if (D.contains(1) && D.contains(2)) {
+			return 6;
+		} else if (D.contains(0) && D.contains(2)) {
+			return 5;
+		} else if ( D.contains(2)) {
+			return 4;
+		} else if (D.contains(0) && D.contains(1)) {
+			return 3;
+		} else if (D.contains(1)) {
+			return 2;
+		} else if (D.contains(0)) {
+			return 1;
+		} else {
+			return 0;
 		}
-		
-		for (int i=0;i<Dtab.length;i++) {
-			Dprime[Dtab[i]-1]=1;
-		}
-		int res = 0;
-		
-		for (int k=0; k<Dprime.length;k++) {
-			res+=(int)Math.pow(5, Dprime[k]);
-		}
-		
-		return res;
 	}
 	
 	public static int[] setToTab(Set<Integer> set ) {
@@ -88,7 +132,7 @@ public class modeleDeux {
 	}
 	
 	public static void main(String[] args) {
-		int[] horizons = {1,2,3,4};
+		int[] horizons= {0,1,2,3,4};
 		
 		//Paramètres
 		
@@ -153,8 +197,18 @@ public class modeleDeux {
 			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,32);
 		}
 
-		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
+		Set<Integer> ints = ImmutableSet.of(0, 1, 2, 3, 4);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
+		
+		// Affichage de l'ensemble D 
+		/*
+		for (Set<Integer> element : ensembleD) {
+			int[] tabElement = setToTab(element);
+			for (int entier : tabElement) {
+				System.out.println(entier);			
+			}	System.out.println("\n");
+			
+		}*/
 		
 		for(int k=0; k<nbAgents; k++) {
 			for (int j=0; j<H; j++) {
@@ -181,16 +235,16 @@ public class modeleDeux {
 		
 		
 		//Contrainte 4.1
-		/*for (int p=0;p<(int)(H-6);p++) {
-			for (int k=0; k<nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[7];
-				for (int i=0;i<7;i++) {
-					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
-				}
+			for (int p=0;p<(int)(H-6);p++) {
+				for (int k=0; k<nbAgents; k++) {
+					IntVar[] tabKron= new IntVar[7];
+					for (int i=0;i<7;i++) {
+						tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
+					}
 						
-				model.sum(tabKron,"<=",8).post();//
+					model.sum(tabKron,"<=",8).post();//
+				}
 			}
-		}
 				
 		// Contrainte 4.2
 			
@@ -287,13 +341,12 @@ public class modeleDeux {
 		for (int j=0;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
 				ArrayList<Integer> domaine = new ArrayList<Integer>();
-				domaine.add(5);
+				domaine.add(4);
 				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(domaine))],"*", DeltaPlannifD[k][j+1][indexage(tabToSet(domaine))], "=", 0).post();;
 			}
 		}
 		
-
-	
+		/*
 		// Contrainte 9.1
 		/*
 		for (int k=0; k<nbAgents;k++){
@@ -315,14 +368,16 @@ public class modeleDeux {
 		}*/
 
 		//Contrainte 10
-
+		
 		for (int j=0; j<H; j++){
-			
+			/*
 			IntVar[] occurence = new IntVar[4];
 			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
 			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
 			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
 			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
+			*/
+			IntVar[] occurence = new IntVar[4];
 			System.out.println(ArrayUtils.getColumn(Plannifs,j)[1]);
 			// PROBLEME : on compte le nombre d'occurences de valeurs dans des variables pas encore instanciées ??
 			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
@@ -335,7 +390,7 @@ public class modeleDeux {
 		
 		/*
 		// Contrainte 9.2
-		/*for(int i=0; i<7;i++) {
+		for(int i=0; i<7;i++) {
 			IntVar[] tabkron = new IntVar[nbAgents];
 			for(int k=0; k<nbAgents; k++) {
 				ArrayList<Integer> Domaine = new ArrayList<Integer>();
@@ -360,10 +415,8 @@ public class modeleDeux {
 
 		}
 		*/
-
 		
 		solver.findSolution();
-		System.out.println("arrive la");
 		//Solution mySolution = model.getSolver().findSolution();
 		for (int i=0; i<nbAgents; i++){
 			for (int j=0; j<H; j++){
@@ -372,5 +425,6 @@ public class modeleDeux {
 			System.out.println();
 		}
 		solver.showStatistics();
+		
 	}
 }
