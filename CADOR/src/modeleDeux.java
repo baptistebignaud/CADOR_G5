@@ -6,8 +6,15 @@ import java.util.List;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.tools.ArrayUtils;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 
 public class modeleDeux {
 	static Model model = new Model("modele2");
@@ -32,10 +39,42 @@ public class modeleDeux {
 		IntVar kroneck = model.intVar("kroneck",0,1,true);
 		if(integer.contains(Plannif.getValue())) model.arithm(kroneck, "=", 1) ;
 		else model.arithm(kroneck, "=", 0);
-	return kroneck;	
+		return kroneck;	
 	}
 	
+	public static int indexage(Set<Integer> D) {
 		
+		int[] Dprime = new int[5];
+		for (int j=0;j<Dprime.length;j++) {
+			Dprime[j]=0;
+		}
+		int[] Dtab = new int[D.size()];
+		int index =0;
+		for (int num : D) {
+			Dtab[index]=num;
+			index++;
+		}
+
+		for (int i=0;i<Dtab.length;i++) {
+			Dprime[Dtab[i]-1]=1;
+		}
+		int res = 0;
+		for (int k=0; k<Dprime.length;k++) {
+			res+=(int)Math.pow(5, Dprime[k]);
+		}
+		return res;
+	}
+	
+	public static int[] setToTab(Set<Integer> set ) {
+		int[] res = new int[set.size()];
+		int index =0;
+		for (int num : set) {
+			res[index]=num;
+			index++;
+		}
+		return res;
+	}
+	
 	public static void main(String[] args) {
 		int[] horizons = {1,2,3,4};
 		
@@ -97,6 +136,15 @@ public class modeleDeux {
 		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,6);
 		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
+		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
+		for(int i=0; i<nbAgents;i++) {
+			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,120);
+		}
+
+		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
+		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
+
+		/*
 		//Contraintes
 		
 		//Contrainte 3.2
@@ -186,10 +234,8 @@ public class modeleDeux {
 
 					model.sum(vars, ">=", 1).post();
 
-
 				}
 			}
-
 		}
 
 		//Contrainte 4.4
@@ -229,7 +275,6 @@ public class modeleDeux {
 			}
 		}*/
 		
-
 		// Contrainte 9.1
 		/*
 		for (int k=0; k<nbAgents;k++){
@@ -264,9 +309,7 @@ public class modeleDeux {
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
 
 		}
-
-
-		
+		/*
 		// Contrainte 9.2
 		/*for(int i=0; i<7;i++) {
 			IntVar[] tabkron = new IntVar[nbAgents];
@@ -290,9 +333,19 @@ public class modeleDeux {
 				}
 			}
 			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
+
 		}
 		*/
 
+		for(int k=0; k<nbAgents; k++) {
+			for (int j=0; j<H; j++) {
+				for (Set<Integer> sousEnsemble : ensembleD) {
+					model.member(Plannifs[k][j], setToTab(sousEnsemble)).reifyWith(DeltaPlannifD[k][j][indexage(sousEnsemble)]);
+				}
+			}
+
+		}
+		
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
 		for (int i=0; i<nbAgents; i++){
@@ -302,10 +355,5 @@ public class modeleDeux {
 			System.out.println();
 		}
 		solver.showStatistics();
-
-		
-		
 	}
-	
-
 }
