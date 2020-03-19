@@ -200,7 +200,7 @@ public class modeleDeux {
 		Set<Integer> ints = ImmutableSet.of(0, 1, 2, 3, 4);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
 		
-		// Affichage de l'ensemble D 
+		// Affichage de l'ensemble D pour la méthode indexage
 		/*
 		for (Set<Integer> element : ensembleD) {
 			int[] tabElement = setToTab(element);
@@ -423,7 +423,7 @@ public class modeleDeux {
 				System.out.print(Plannifs[i][j].getValue()+"  ");
 			}
 			System.out.println();
-		}
+		} 
 		solver.showStatistics();
 		
 	}
