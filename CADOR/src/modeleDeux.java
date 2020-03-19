@@ -32,8 +32,8 @@ public class modeleDeux {
 	// 1 : Jour
 	// 2 : Soir
 	// 3 : Nuit
-	// 4 : JCA
-	// 5 : Vide
+	// 4 : Vide
+	// JCA à part
 	public static final List<Integer> creneaux = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4,5));
 	
 	public static IntVar kronecker(ArrayList<Integer> integer,IntVar Plannif) {
@@ -45,7 +45,7 @@ public class modeleDeux {
 	
 	public static int indexage(Set<Integer> D) {
 		
-		int[] Dprime = new int[6];
+		int[] Dprime = new int[5];
 		for (int j=0;j<Dprime.length;j++) {
 			Dprime[j]=0;
 		}
@@ -58,12 +58,12 @@ public class modeleDeux {
 		}
 		
 		for (int i=0;i<Dtab.length;i++) {
-			Dprime[Dtab[i]]=1;
+			Dprime[Dtab[i]-1]=1;
 		}
 		int res = 0;
 		
 		for (int k=0; k<Dprime.length;k++) {
-			res+=(int)Math.pow(6, Dprime[k]);
+			res+=(int)Math.pow(5, Dprime[k]);
 		}
 		
 		return res;
@@ -153,7 +153,7 @@ public class modeleDeux {
 			DeltaPlannifD[i] = model.boolVarMatrix("DeltaPlannifD["+i+"]",H,32);
 		}
 
-		Set<Integer> ints = ImmutableSet.of(0, 1, 2, 3, 4, 5);
+		Set<Integer> ints = ImmutableSet.of(1, 2, 3, 4, 5);
 		Set<Set<Integer>> ensembleD = Sets.powerSet(ints);
 		System.out.println(ensembleD);
 		
