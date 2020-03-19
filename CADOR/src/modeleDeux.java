@@ -189,7 +189,7 @@ public class modeleDeux {
 		
 		
 		//Variables
-		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,6);
+		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,4);
 		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
 		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
@@ -370,22 +370,17 @@ public class modeleDeux {
 		//Contrainte 10
 		
 		for (int j=0; j<H; j++){
-			/*
+			
 			IntVar[] occurence = new IntVar[4];
 			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
 			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
 			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
 			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
-			*/
-			IntVar[] occurence = new IntVar[4];
-			System.out.println(ArrayUtils.getColumn(Plannifs,j)[1]);
-			// PROBLEME : on compte le nombre d'occurences de valeurs dans des variables pas encore instanciées ??
 			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
 			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
 			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
 			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
-			System.out.println(occurence[0]);
 		}
 		
 		/*
