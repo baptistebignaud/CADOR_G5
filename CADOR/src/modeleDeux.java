@@ -253,8 +253,8 @@ public class modeleDeux {
 			
 		for(int k=0;k<nbAgents;k++) {
 			for(int j=0;j<H-1;j++) {
-				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"=", 0).post();
-				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
 			}
 		}
 		/*
@@ -338,14 +338,11 @@ public class modeleDeux {
 		
 		// Contrainte 9.1
 		
-
 		for (int k=0; k<nbAgents;k++){
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[contrat_agent[k][1]][1]-1];
 			for (int p=0; p<((H+1)/7)-2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;i++){
 				    vars[i]=model.intVar(0,1,true);
-				    System.out.println(DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))].isInstantiated());
-				    System.out.println(DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]);
 	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]).post();
 					}
 				}
