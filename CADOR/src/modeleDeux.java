@@ -314,20 +314,21 @@ public class modeleDeux {
 			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[13];
 				for (int i=0;i<13;i++) {
-					tabKron[i] = model.intVar(0, 1, true);
 					tabKron[i] = DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
 				}
 
 				model.sum(tabKron,">=",4).post();
 			}
 		}
+		
 		/*
+		//Mets des zéros partout
 		for (int p=0;p<(int)H/7-2;p++) {
 			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[12];
 				for (int i=0;i<12;i++) {
-					// Faire produit de deux boolvar à stocker dans une intvar
-					model.arithm(DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],"*",DeltaPlannifD[k][7*p+i+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],"=",tabKron[i]);
+					tabKron[i] = model.intVar(0, 1, true);
+					model.times(DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],DeltaPlannifD[k][7*p+i+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],tabKron[i]).post();
 				}
 				
 				model.sum(tabKron,">=",1).post();
