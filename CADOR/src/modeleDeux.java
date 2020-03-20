@@ -152,7 +152,22 @@ public class modeleDeux {
 		};
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
-		int[] contrats = {6,1,3,1,0,0,0};
+		int[] contrats = {5,1,3,1,0,0,0};
+		
+		// Renvoie le type de contrat d'un agent k
+		
+		int[][] contrat_agent = {
+				{0,0},
+				{1,0},
+				{2,0},
+				{3,0},
+				{4,0},
+				{5,1},
+				{6,2},
+				{7,2},
+				{8,2},
+				{9,1}
+			};
 		
 		// Temps de travail relatif à chaque type de contrat
 		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
@@ -190,7 +205,6 @@ public class modeleDeux {
 		
 		//Variables
 		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,4);
-		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
 		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
 		for(int i=0; i<nbAgents;i++) {
@@ -235,16 +249,15 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
 			for(int j=0;j<H-1;j++) {
-				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"=", 0).post();
-				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
 			}
 		}
-		*/
+		/*
 		
 		//Contrainte 4.3
         for (int k=0; k<nbAgents; k++){
@@ -286,7 +299,7 @@ public class modeleDeux {
                 }
             }
         }
-		
+		*/
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
@@ -322,21 +335,23 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
+		
 		// Contrainte 9.1
-		/*
+		
 
 		for (int k=0; k<nbAgents;k++){
-			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
-			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
-				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
+			IntVar[] vars = new IntVar[2*nbDimancheTravailles[contrat_agent[k][1]][1]-1];
+			for (int p=0; p<((H+1)/7)-2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;p++){
+				for(int i=0; i<2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;i++){
 				    vars[i]=model.intVar(0,1,true);
-	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))]).post();
+				    System.out.println(DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))].isInstantiated());
+				    System.out.println(DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]);
+	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]).post();
 					}
 				}
-			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
+					model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
 			}
-		*/
+		
 		
 		/*
 		// Contrainte 9.2
