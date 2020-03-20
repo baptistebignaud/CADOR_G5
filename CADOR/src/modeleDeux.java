@@ -217,22 +217,25 @@ public class modeleDeux {
 				}
 			}
 		}
-		/*
+		
 		//Contraintes
 		
 		//Contrainte 3.2
 		
 		for (int p=0;p<(int)(H/7);p++) {
 			for (int k=0; k<nbAgents; k++) {
+				
 				IntVar[] tabKron= new IntVar[7];
 				for (int i=0;i<7;i++) {
-					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][7*p+i]);
+					tabKron[i] = model.intVar(0, 1,true);
+					model.arithm(tabKron[i], "=", DeltaPlannifD[k][7*p+i][15]).post();;
 				}
 				
 				model.sum(tabKron,"<=",5).post();
 			}
 		}
 		
+		/*
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
@@ -241,60 +244,49 @@ public class modeleDeux {
 				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
 			}
 		}
-		
-		/*
-		//Contrainte 4.3
-		for (int k=0; k<nbAgents; k++){
-			for (int p=0; p<H/7; p++) {
-				for (int j=7*p; j<7*p+4;j++){
-					IntVar[][] tabKron = new IntVar[5][3];
-					tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j]);
-					tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2, 3, 5)), Plannifs[k][j + 1]);
-
-					tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j]);
-					tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(3, 5)), Plannifs[k][j + 1]);
-
-					tabKron[2][0] = kronecker(new ArrayList<Integer>(Arrays.asList(1)), Plannifs[k][j]);
-					tabKron[2][2] = kronecker(new ArrayList<Integer>(Arrays.asList(3, 5)), Plannifs[k][j + 1]);
-
-					tabKron[3][0] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
-					tabKron[3][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j + 1]);
-					tabKron[3][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0, 5)), Plannifs[k][j + 2]);
-
-					tabKron[4][0] = kronecker(new ArrayList<Integer>(Arrays.asList(3)), Plannifs[k][j]);
-					tabKron[4][1] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][j + 1]);
-					tabKron[4][2] = kronecker(new ArrayList<Integer>(Arrays.asList(0, 1, 5)), Plannifs[k][j + 2]);
-
-					IntVar[] vars = new IntVar[5];
-
-					vars[0] = model.intVar(0, 1, true);
-					model.arithm(tabKron[0][0], "*", tabKron[0][1], "=", vars[0]).post();
-
-					vars[1] = model.intVar(0, 1, true);
-					model.arithm(tabKron[1][0], "*", tabKron[1][1], "=", vars[1]).post();
-
-					vars[2] = model.intVar(0, 1, true);
-					model.arithm(tabKron[2][0], "*", tabKron[2][2], "=", vars[2]).post();
-
-					IntVar var33 = model.intVar(0, 1, true);
-					model.arithm(tabKron[3][1], "+", tabKron[3][2], "=", var33).post();
-					vars[3] = model.intVar(0, 1, true);
-					model.arithm(tabKron[3][0], "*", var33, "=", vars[3]).post();
-
-
-					IntVar var44 = model.intVar(0, 1, true);
-					model.arithm(tabKron[4][1], "+", tabKron[4][2], "=", var44).post();
-					vars[4] = model.intVar(0, 1, true);
-					model.arithm(tabKron[4][0], "*", var33, "=", vars[4]).post();
-
-					model.sum(vars, ">=", 1).post();
-
-				}
-			}
-		}
-		
-		
 		*/
+		
+		//Contrainte 4.3
+        for (int k=0; k<nbAgents; k++){
+            for (int p=0; p<H/7; p++) {
+                for (int j=7*p; j<7*p+4;j++){
+                    IntVar[][] tabKron = new IntVar[5][3];
+                    tabKron[0][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
+                    tabKron[0][1] = DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2,3,4))))];
+
+                    tabKron[1][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))];
+                    tabKron[1][1] = DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3,4))))];
+
+                    tabKron[2][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(1))))];
+                    tabKron[2][1] = DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
+
+                    tabKron[3][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))];
+                    tabKron[3][1] = DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
+                    tabKron[3][2] = DeltaPlannifD[k][j+2][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,4))))];
+
+                    tabKron[4][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))];
+                    tabKron[4][1] = DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
+                    tabKron[4][2] = DeltaPlannifD[k][j+2][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1,4))))];
+                    IntVar[] vars = new IntVar[5];
+                    vars[0] = model.intVar(0, 1, true);
+                    model.arithm(tabKron[0][0], "*", tabKron[0][1], "=", vars[0]).post();
+                    vars[1] = model.intVar(0, 1, true);
+                    model.arithm(tabKron[1][0], "*", tabKron[1][1], "=", vars[1]).post();
+                    vars[2] = model.intVar(0, 1, true);
+                    model.arithm(tabKron[2][0], "*", tabKron[2][1], "=", vars[2]).post();
+                    IntVar var33 = model.intVar(0, 1, true);
+                    model.arithm(tabKron[3][1], "+", tabKron[3][2], "=", var33).post();
+                    vars[3] = model.intVar(0, 1, true);
+                    model.arithm(tabKron[3][0], "*", var33, "=", vars[3]).post();
+                    IntVar var44 = model.intVar(0, 1, true);
+                    model.arithm(tabKron[4][1], "+", tabKron[4][2], "=", var44).post();
+                    vars[4] = model.intVar(0, 1, true);
+                    model.arithm(tabKron[4][0], "*", var33, "=", vars[4]).post();
+                    model.sum(vars, ">=", 1).post();
+                }
+            }
+        }
+		
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
@@ -333,24 +325,49 @@ public class modeleDeux {
 		/*
 		// Contrainte 9.1
 		/*
+
 		for (int k=0; k<nbAgents;k++){
-			System.out.println(2*nbDimancheTravailles[k][1]);
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
 				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
-
-					System.out.println("k="+k);
-					System.out.println("p="+p);
-					System.out.println("i="+i);
-					System.out.println(7*(p+i)+5);
-					System.out.println(Plannifs[k][7*(p+i)+5]);
-					System.out.printf("end");
-					//vars[i] = kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*(p+i)+5]);
+				    vars[i]=model.intVar(0,1,true);
+	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))]).post();
+					}
+				}
+			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
+			}
+		*/
+		
+		/*
+		// Contrainte 9.2
+		for(int i=0; i<7;i++) {
+			IntVar[] tabkron = new IntVar[nbAgents];
+			for(int k=0; k<nbAgents; k++) {
+				ArrayList<Integer> Domaine = new ArrayList<Integer>();
+				Domaine.add(i);
+				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
+			}
+			
+			model.sum(tabkron,"=",contrats[i]).post();
+		}
+		
+		
+		
+		
+		// Contrainte 9.3
+		for(int k=0; k<nbAgents; k++) {
+			IntVar[] vars = new IntVar[H];
+			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
+			 for(int p=0; p<(int)(H/7); p++) {
+				for(int j=7*p; j<7*p+7; j++) {
+					vars[j] = model.intVar(0,1,true);
+					model.arithm(vars[j], "=", DeltaPlannifD[k][j][indexage(tabToSet(Domaine))]).post();
+					//vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
 				}
 			}
-			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
-		}*/
-
+			model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k].getValue()]))).post();
+		}
+		*/
 		//Contrainte 10
 		
 		for (int j=0; j<H; j++){
@@ -366,33 +383,6 @@ public class modeleDeux {
 			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
 		}
-		
-		/*
-		// Contrainte 9.2
-		for(int i=0; i<7;i++) {
-			IntVar[] tabkron = new IntVar[nbAgents];
-			for(int k=0; k<nbAgents; k++) {
-				ArrayList<Integer> Domaine = new ArrayList<Integer>();
-				Domaine.add(i);
-				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
-			}
-			
-			model.sum(tabkron,"=",contrats[i]).post();
-		}
-		
-		// Contrainte 9.3
-		for(int k=0; k<nbAgents; k++) {
-			IntVar[] vars = new IntVar[H];
-			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
-			 for(int p=0; p<(int)(H/7); p++) {
-				for(int j=7*p; j<7*p+7; j++) {
-					vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
-				}
-			}
-			model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k].getValue()]))).post();
-
-		}
-		*/
 		
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
