@@ -217,24 +217,24 @@ public class modeleDeux {
 				}
 			}
 		}
-		/*
+		
 		//Contraintes
 		
 		//Contrainte 3.2
 		
 		for (int p=0;p<(int)(H/7);p++) {
 			for (int k=0; k<nbAgents; k++) {
+				
 				IntVar[] tabKron= new IntVar[7];
 				for (int i=0;i<7;i++) {
-					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][7*p+i]);
+					tabKron[i] = model.intVar(0, 1,true);
+					model.arithm(tabKron[i], "=", DeltaPlannifD[k][7*p+i][15]).post();;
 				}
 				
 				model.sum(tabKron,"<=",5).post();
 			}
 		}
-		*/
-		
-		
+
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
@@ -244,11 +244,12 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
+		
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
             for (int p=0; p<H/7; p++) {
             	IntVar[] vars = new IntVar[5];
+
                 for (int j=7*p; j<7*p+4;j++){
                     IntVar[][] tabKron = new IntVar[5][3];
                     tabKron[0][0] = DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
@@ -285,9 +286,8 @@ public class modeleDeux {
                 }
                 model.sum(vars, ">=", 1).post();
             }
-		}
-		*/
-		
+        }
+
 		//Contrainte 4.4
 		for (int p=0;p<(int)(H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
@@ -326,6 +326,7 @@ public class modeleDeux {
 		
 		/*
 		// Contrainte 9.1
+
 		for (int k=0; k<nbAgents;k++){
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
 			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
@@ -333,7 +334,6 @@ public class modeleDeux {
 				    vars[i]=model.intVar(0,1,true);
 	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))]).post();
 					}
-
 				}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
 
@@ -369,19 +369,38 @@ public class modeleDeux {
 			model.sum(tabkron,"=",contrats[i]).post();
 		}
 		
+		
+		
+		
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
 			IntVar[] vars = new IntVar[H];
 			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
 			 for(int p=0; p<(int)(H/7); p++) {
 				for(int j=7*p; j<7*p+7; j++) {
-					vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
+					vars[j] = model.intVar(0,1,true);
+					model.arithm(vars[j], "=", DeltaPlannifD[k][j][indexage(tabToSet(Domaine))]).post();
+					//vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
 				}
 			}
 			model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k].getValue()]))).post();
-
 		}
 		*/
+		//Contrainte 10
+		
+		for (int j=0; j<H; j++){
+			
+			IntVar[] occurence = new IntVar[4];
+			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
+			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
+			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
+			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
+			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
+			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
+			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
+			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
+			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
+		}
 		
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
