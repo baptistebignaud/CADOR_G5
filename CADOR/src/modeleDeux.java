@@ -232,8 +232,9 @@ public class modeleDeux {
 				model.sum(tabKron,"<=",5).post();
 			}
 		}
-		
 		*/
+		
+		
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
@@ -243,7 +244,7 @@ public class modeleDeux {
 			}
 		}
 		
-		
+		/*
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
             for (int p=0; p<H/7; p++) {
@@ -285,7 +286,7 @@ public class modeleDeux {
                 model.sum(vars, ">=", 1).post();
             }
 		}
-		
+		*/
 		
 		//Contrainte 4.4
 		for (int p=0;p<(int)(H/7)-1;p++) {
@@ -313,6 +314,7 @@ public class modeleDeux {
 			}
 		}
 		
+		*/
 		// Contrainte 5.3.2
 		for (int j=0;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
@@ -321,7 +323,6 @@ public class modeleDeux {
 				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(domaine))],"*", DeltaPlannifD[k][j+1][indexage(tabToSet(domaine))], "=", 0).post();;
 			}
 		}
-		*/
 		
 		/*
 		// Contrainte 9.1
@@ -335,27 +336,26 @@ public class modeleDeux {
 
 				}
 			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
-			}
-		*/
-		
-		/*
+
+		}*/
+
 		//Contrainte 10
+		
 		for (int j=0; j<H; j++){
+			
 			IntVar[] occurence = new IntVar[4];
 			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
 			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
 			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
 			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
-			System.out.println(ArrayUtils.getColumn(Plannifs,j)[1]);
-			// PROBLEME : on compte le nombre d'occurences de valeurs dans des variables pas encore instanciées ??
+
 			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
 			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
 			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
 			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
 			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
 		}
-		*/
-		
+
 		/*
 		// Contrainte 9.2
 		for(int i=0; i<7;i++) {
@@ -372,26 +372,58 @@ public class modeleDeux {
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
 			IntVar[] vars = new IntVar[H];
-			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3,4));
+			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
 			 for(int p=0; p<(int)(H/7); p++) {
 				for(int j=7*p; j<7*p+7; j++) {
-					vars[j] = kronecker(Domaine, Plannifs[k][j]);
-
+					vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
 				}
 			}
-			model.sum(vars,"<=",(int)(Math.floor(45/6*pourcent_contrat[contrat_agent[k].getValue()]))).post();
+			model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k].getValue()]))).post();
 
 		}
 		*/
 		
 		solver.findSolution();
 		//Solution mySolution = model.getSolver().findSolution();
-		for (int i=0; i<nbAgents; i++){
+		
+		String resu="";
+		resu+=String.format("%1$-15s","") ;
+		String [] jours = {"Lundi", "Mardi", "Mercredi" , "Jeudi" , "Vendredi" , "Samedi", "Dimanche"};
+		for (int j=0; j<H; j++){
+			resu+=String.format("%1$-15s",jours[j%7]+ ((j/7)+1)) ;
+		}
+		resu+="\n";
+		
+		for (int k=0; k<nbAgents; k++){
+			resu+=String.format("%1$-15s","Agent "+ k) ;
+		
 			for (int j=0; j<H; j++){
-				System.out.print(Plannifs[i][j].getValue()+"  ");
+				String creneau= "";
+				if (Plannifs[k][j].getValue()==0) {
+					creneau="Matin";
+				}
+				
+				if (Plannifs[k][j].getValue()==1) {
+					creneau="Jour";
+				}
+				
+				if (Plannifs[k][j].getValue()==2) {
+					creneau="Soir";
+				}
+				
+				if (Plannifs[k][j].getValue()==3) {
+					creneau="Nuit";
+				}
+				
+				if (Plannifs[k][j].getValue()==4) {
+					creneau="Repos";
+				}
+				
+				resu+=String.format("%1$-15s",creneau +"  ") ;
 			}
-			System.out.println();
+			resu+="\n";
 		} 
+		System.out.println(resu);
 		solver.showStatistics();
 		
 	}
