@@ -339,9 +339,7 @@ public class modeleDeux {
 			}
 		}
 		
-		
 		// Contrainte 9.1
-
 		for (int k=0; k<nbAgents;k++){
 			IntVar[] vars = new IntVar[2*nbDimancheTravailles[contrat_agent[k][1]][1]-1];
 			for (int p=0; p<((H+1)/7)-2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;p++){
@@ -352,23 +350,6 @@ public class modeleDeux {
 				}
 					model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
 			}
-		
-
-		
-		for (int j=0; j<H; j++){
-			
-			IntVar[] occurence = new IntVar[4];
-			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
-			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
-			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
-			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
-
-			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
-			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
-			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
-			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
-			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
-		}
 
 		/*
 		// Contrainte 9.2
@@ -382,9 +363,6 @@ public class modeleDeux {
 			
 			model.sum(tabkron,"=",contrats[i]).post();
 		}
-		
-		
-		
 		
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
