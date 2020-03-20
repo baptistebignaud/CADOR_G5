@@ -138,7 +138,7 @@ public class modeleDeux {
 		
 		// Horizon sur lequel on souhaite planifier
 		//int H = horizon(horizons);
-		int H=7*5;
+		int H=12;
 		
 		// Données fournies sur les besoins en personnel
 		// Maquette[i][j] = besoin en personnel sur le créneau
@@ -152,7 +152,7 @@ public class modeleDeux {
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
 
-		int[] contrats = {6,1,3,1,0,0,0};
+		int[] contrats = {5,1,3,1,0,0,0};
 		int nbAgents = 0;
 		for (int val:contrats) {
 			nbAgents += val;
@@ -262,7 +262,7 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
+		
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
             for (int p=0; p<H/7; p++) {
@@ -300,17 +300,18 @@ public class modeleDeux {
                     IntVar var44 = model.intVar(0, 1, true);
                     model.arithm(tabKron[4][1], "+", tabKron[4][2], "=", var44).post();
                     vars[4] = model.intVar(0, 1, true);
-                    model.arithm(tabKron[4][0], "*", var33, "=", vars[4]).post();
+                    model.arithm(tabKron[4][0], "*", var44, "=", vars[4]).post();
                 }
                 model.sum(vars, ">=", 1).post();
             }
         }
-	*/
+        
+		
 		//Contrainte 4.4
-		for (int p=0;p<(int)(H/7)-1;p++) {
-			for (int k=0; k<nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[13];
-				for (int i=0;i<13;i++) {
+		for (int k=0; k<nbAgents; k++) {
+			for (int p=0;p<(int)(H/7)-1;p++) {
+				IntVar[] tabKron= new IntVar[14];
+				for (int i=0;i<14;i++) {
 					tabKron[i] = DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
 				}
 
@@ -320,10 +321,10 @@ public class modeleDeux {
 		
 		/*
 		//Met des zéros partout
-		for (int p=0;p<(int)(H/7)-2;p++) {
-			for (int k=0; k<nbAgents; k++) {
-				IntVar[] tabKron= new IntVar[12];
-				for (int i=0;i<12;i++) {
+		for (int k=0; k<nbAgents; k++) {	
+			for (int p=0;p<(int)(H/7)-1;p++) {
+				IntVar[] tabKron= new IntVar[13];
+				for (int i=0;i<13;i++) {
 					tabKron[i] = model.intVar(0, 1, true);
 					model.times(DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],DeltaPlannifD[k][7*p+i+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],tabKron[i]).post();
 				}
@@ -331,7 +332,6 @@ public class modeleDeux {
 				model.sum(tabKron,">=",1).post();
 			}
 		}
-		
 		*/
 		
 		// Contrainte 5.3.2
@@ -351,37 +351,26 @@ public class modeleDeux {
 				    vars[i]=model.intVar(0,1,true);
 	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]).post();
 					}
+				model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
 				}
-					model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
 			}
 
-		/*
-		// Contrainte 9.2
-		for(int i=0; i<7;i++) {
-			IntVar[] tabkron = new IntVar[nbAgents];
-			for(int k=0; k<nbAgents; k++) {
-				ArrayList<Integer> Domaine = new ArrayList<Integer>();
-				Domaine.add(i);
-				tabkron[k] = kronecker(Domaine, contrat_agent[k]);
-			}
-			
-			model.sum(tabkron,"=",contrats[i]).post();
-		}
 		
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
-			IntVar[] vars = new IntVar[H];
 			ArrayList<Integer> Domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
 			 for(int p=0; p<(int)(H/7); p++) {
+				IntVar[] vars = new IntVar[7];
 				for(int j=7*p; j<7*p+7; j++) {
-					vars[j] = model.intVar(0,1,true);
-					model.arithm(vars[j], "=", DeltaPlannifD[k][j][indexage(tabToSet(Domaine))]).post();
+					vars[j%7] = model.intVar(0,1,true);
+					model.arithm(vars[j%7], "=", DeltaPlannifD[k][j][indexage(tabToSet(Domaine))]).post();
 					//vars[j] = DeltaPlannifD[k][j][indexage(tabToSet(Domaine))];
 				}
+				model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k][1]]))).post();
 			}
-			model.sum(vars,"<=",(int)(Math.floor((45/6)*pourcent_contrat[contrat_agent[k].getValue()]))).post();
 		}
-		*/
+		
+		
 		//Contrainte 10
 		
 		for (int j=0; j<H; j++){
