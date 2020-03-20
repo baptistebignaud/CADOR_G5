@@ -139,7 +139,6 @@ public class modeleDeux {
 		// Horizon sur lequel on souhaite planifier
 		//int H = horizon(horizons);
 		int H=7*5;
-		int nbAgents=10;
 		
 		// Données fournies sur les besoins en personnel
 		// Maquette[i][j] = besoin en personnel sur le créneau
@@ -153,6 +152,10 @@ public class modeleDeux {
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
 		int[] contrats = {6,1,3,1,0,0,0};
+		int nbAgents = 0;
+		for (int val:contrats) {
+			nbAgents += val;
+		}
 		
 		// Temps de travail relatif à chaque type de contrat
 		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
