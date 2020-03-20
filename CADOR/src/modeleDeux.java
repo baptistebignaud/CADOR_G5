@@ -245,22 +245,18 @@ public class modeleDeux {
 					model.sum(tabKron,"<=",8).post();//
 				}
 			}
-				
+		
+		*/
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
 			for(int j=0;j<H-1;j++) {
-				IntVar[][] tabKron = new IntVar[2][2];
-				tabKron[0][0] = kronecker(new ArrayList<Integer>(Arrays.asList(3)), Plannifs[k][j]);
-				tabKron[1][0] = kronecker(new ArrayList<Integer>(Arrays.asList(0,1)), Plannifs[k][j+1]);
-				tabKron[0][1] = kronecker(new ArrayList<Integer>(Arrays.asList(2)), Plannifs[k][j]);
-				tabKron[1][1] = kronecker(new ArrayList<Integer>(Arrays.asList(0)), Plannifs[k][j+1]);
-
-				model.arithm(tabKron[0][0],"*",tabKron[0][1],"=",0 ).post();
-				model.arithm(tabKron[1][0],"*",tabKron[1][1],"=",0 ).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
 			}
 		}
-			
+		
+		/*
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
 			for (int p=0; p<H/7; p++) {
@@ -310,33 +306,34 @@ public class modeleDeux {
 				}
 			}
 		}
-
+		*/
+		
+		
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[13];
 				for (int i=0;i<13;i++) {
-					tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(5)), Plannifs[k][7*p+i]);
+					tabKron[i] = model.intVar(0, 1, true);
+					tabKron[i] = DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))];
 				}
 
-				
 				model.sum(tabKron,">=",4).post();
 			}
 		}
-
+		/*
 		for (int p=0;p<(int)H/7-2;p++) {
 			for (int k=0; k<nbAgents; k++) {
 				IntVar[] tabKron= new IntVar[12];
 				for (int i=0;i<12;i++) {
-					ArrayList<Integer> Domaine = new ArrayList<Integer>();
-					Domaine.add(5);
-					tabKron[i]=kronecker(Domaine, Plannifs[k][7*p+i]);
+					// Faire produit de deux boolvar à stocker dans une intvar
+					model.arithm(DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],"*",DeltaPlannifD[k][7*p+i+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))],"=",tabKron[i]);
 				}
 				
-				model.sum(tabKron,">=",4).post();
+				model.sum(tabKron,">=",1).post();
 			}
 		}
-		*/
+		
 		// Contrainte 5.3.2
 		for (int j=0;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
