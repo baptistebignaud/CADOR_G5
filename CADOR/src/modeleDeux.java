@@ -233,20 +233,6 @@ public class modeleDeux {
 			}
 		}
 		
-		
-		//Contrainte 4.1
-			for (int p=0;p<(int)(H-6);p++) {
-				for (int k=0; k<nbAgents; k++) {
-					IntVar[] tabKron= new IntVar[7];
-					for (int i=0;i<7;i++) {
-						tabKron[i]=kronecker(new ArrayList<Integer>(Arrays.asList(0,1,2,3,4)), Plannifs[k][p+i]);
-					}
-						
-					model.sum(tabKron,"<=",8).post();//
-				}
-			}
-		
-		
 		// Contrainte 4.2
 			
 		for(int k=0;k<nbAgents;k++) {
@@ -308,7 +294,7 @@ public class modeleDeux {
 		}
 		
 		
-		
+		*/
 		//Contrainte 4.4
 		for (int p=0;p<((int)H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
