@@ -151,11 +151,27 @@ public class modeleDeux {
 		};
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
+
 		int[] contrats = {6,1,3,1,0,0,0};
 		int nbAgents = 0;
 		for (int val:contrats) {
 			nbAgents += val;
 		}
+		
+		// Renvoie le type de contrat d'un agent k
+		
+		int[][] contrat_agent = {
+				{0,0},
+				{1,0},
+				{2,0},
+				{3,0},
+				{4,0},
+				{5,1},
+				{6,2},
+				{7,2},
+				{8,2},
+				{9,1}
+			};
 		
 		// Temps de travail relatif à chaque type de contrat
 		double[] pourcent_contrat = {1,0.9,0.8,0.75,0.7,0.6,0.5};
@@ -193,7 +209,6 @@ public class modeleDeux {
 		
 		//Variables
 		IntVar[][] Plannifs = model.intVarMatrix("Plannification", nbAgents, H, 0,4);
-		IntVar[] contrat_agent = model.intVarArray(nbAgents, 0, 6);
 		
 		BoolVar[][][] DeltaPlannifD = new BoolVar[nbAgents][][];
 		for(int i=0; i<nbAgents;i++) {
@@ -242,12 +257,12 @@ public class modeleDeux {
 			
 		for(int k=0;k<nbAgents;k++) {
 			for(int j=0;j<H-1;j++) {
-				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"=", 0).post();
-				model.arithm(DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(3))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1))))],"=", 0).post();
+				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))],"*",DeltaPlannifD[k][j+1][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0))))],"=", 0).post();
 			}
 		}
 		
-		
+		/*
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
             for (int p=0; p<H/7; p++) {
@@ -290,7 +305,7 @@ public class modeleDeux {
                 model.sum(vars, ">=", 1).post();
             }
         }
-
+	*/
 		//Contrainte 4.4
 		for (int p=0;p<(int)(H/7)-1;p++) {
 			for (int k=0; k<nbAgents; k++) {
@@ -318,6 +333,7 @@ public class modeleDeux {
 		}
 		
 		*/
+		
 		// Contrainte 5.3.2
 		for (int j=0;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
@@ -327,37 +343,17 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
 		// Contrainte 9.1
-
 		for (int k=0; k<nbAgents;k++){
-			IntVar[] vars = new IntVar[2*nbDimancheTravailles[k][1]-1];
-			for (int p=0; p<H-2*nbDimancheTravailles[k][1]-1;p++){
-				for(int i=0; i<2*nbDimancheTravailles[k][1];i++){
+			IntVar[] vars = new IntVar[2*nbDimancheTravailles[contrat_agent[k][1]][1]-1];
+			for (int p=0; p<((H+1)/7)-2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;p++){
+				for(int i=0; i<2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;i++){
 				    vars[i]=model.intVar(0,1,true);
-	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(2))))]).post();
+	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]).post();
 					}
 				}
-			model.sum(vars,">=",nbDimancheTravailles[k][1]).post();
-
-		}*/
-
-		//Contrainte 10
-		
-		for (int j=0; j<H; j++){
-			
-			IntVar[] occurence = new IntVar[4];
-			occurence[0] = model.intVar("occurence0", 0, nbAgents,true);
-			occurence[1] = model.intVar("occurence1", 0, nbAgents,true);
-			occurence[2] = model.intVar("occurence2", 0, nbAgents,true);
-			occurence[3] = model.intVar("occurence3", 0, nbAgents,true);
-
-			model.globalCardinality(ArrayUtils.getColumn(Plannifs,j), new int[]{0,1,2,3},occurence, false).post();
-			model.arithm(occurence[0], ">=", maquette[0][j%7]).post();
-			model.arithm(occurence[1], ">=", maquette[1][j%7]).post();
-			model.arithm(occurence[2], ">=", maquette[2][j%7]).post();
-			model.arithm(occurence[3], ">=", maquette[3][j%7]).post();
-		}
+					model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
+			}
 
 		/*
 		// Contrainte 9.2
@@ -371,9 +367,6 @@ public class modeleDeux {
 			
 			model.sum(tabkron,"=",contrats[i]).post();
 		}
-		
-		
-		
 		
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
