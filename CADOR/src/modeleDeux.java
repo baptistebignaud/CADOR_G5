@@ -262,10 +262,10 @@ public class modeleDeux {
 			}
 		}
 		
-		
+		/*
 		//Contrainte 4.3
 		for (int k=0; k<nbAgents; k++){
-            for (int p=0; p<H/7; p++) {
+            for (int p=0; p<(int)(H/7); p++) {
             	IntVar[] vars = new IntVar[5];
 
                 for (int j=7*p; j<7*p+4;j++){
@@ -305,7 +305,7 @@ public class modeleDeux {
                 model.sum(vars, ">=", 1).post();
             }
         }
-        
+        */
 		
 		//Contrainte 4.4
 		for (int k=0; k<nbAgents; k++) {
@@ -319,8 +319,6 @@ public class modeleDeux {
 			}
 		}
 		
-		/*
-		//Met des zéros partout
 		for (int k=0; k<nbAgents; k++) {	
 			for (int p=0;p<(int)(H/7)-1;p++) {
 				IntVar[] tabKron= new IntVar[13];
@@ -332,7 +330,7 @@ public class modeleDeux {
 				model.sum(tabKron,">=",1).post();
 			}
 		}
-		*/
+		
 		
 		// Contrainte 5.3.2
 		for (int j=0;j<H-1;j++) {
