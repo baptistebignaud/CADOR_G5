@@ -138,7 +138,7 @@ public class modeleDeux {
 		
 		// Horizon sur lequel on souhaite planifier
 		//int H = horizon(horizons);
-		int H=12;
+		int H=14;
 		
 		// Données fournies sur les besoins en personnel
 		// Maquette[i][j] = besoin en personnel sur le créneau
@@ -244,16 +244,15 @@ public class modeleDeux {
 		
 		//Contrainte 3.2
 		
-		for (int p=0;p<(int)(H/7);p++) {
-			for (int k=0; k<nbAgents; k++) {
-				
+		for (int k=0; k<nbAgents; k++) {
+			for  (int p=0;p<(int)(H/7);p++){
 				IntVar[] tabKron= new IntVar[7];
 				for (int i=0;i<7;i++) {
 					tabKron[i] = model.intVar(0, 1,true);
-					model.arithm(tabKron[i], "=", DeltaPlannifD[k][7*p+i][15]).post();;
+					model.arithm(tabKron[i], "=", DeltaPlannifD[k][7*p+i][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1,2,3))))]).post();;
 				}
 				
-				model.sum(tabKron,"<=",5).post();
+				model.sum(tabKron,"<=",(int)(Math.floor(5*pourcent_contrat[contrat_agent[k][1]]))).post();
 			}
 		}
 
@@ -337,11 +336,17 @@ public class modeleDeux {
 		
 		
 		// Contrainte 5.3.2
-		for (int j=0;j<H-1;j++) {
+		for (int j=1;j<H-1;j++) {
 			for (int k=0;k<nbAgents;k++) {
-				ArrayList<Integer> domaine = new ArrayList<Integer>();
-				domaine.add(4);
-				model.arithm(DeltaPlannifD[k][j][indexage(tabToSet(domaine))],"*", DeltaPlannifD[k][j+1][indexage(tabToSet(domaine))], "=", 0).post();;
+				IntVar[] vars = new IntVar[2];
+				IntVar var1 = model.intVar(0,1,true);
+				vars[0] = var1;
+				IntVar var2 = model.intVar(0,1,true);
+				vars[1] = var2;
+				ArrayList<Integer> domaine = new ArrayList<Integer>(Arrays.asList(0,1,2,3));
+				model.times(DeltaPlannifD[k][j][indexage(tabToSet(domaine))], DeltaPlannifD[k][j+1][indexage(tabToSet(domaine))], var1).post();
+				model.times(DeltaPlannifD[k][j][indexage(tabToSet(domaine))], DeltaPlannifD[k][j-1][indexage(tabToSet(domaine))], var2).post();
+				model.sum(vars,">=",DeltaPlannifD[k][j][indexage(tabToSet(domaine))]).post();
 			}
 		}
 		
