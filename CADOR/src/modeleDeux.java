@@ -352,16 +352,14 @@ public class modeleDeux {
 		
 		// Contrainte 9.1
 		for (int k=0; k<nbAgents;k++){
-			IntVar[] vars = new IntVar[2*nbDimancheTravailles[contrat_agent[k][1]][1]-1];
-			for (int p=0; p<((H+1)/7)-2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;p++){
-				for(int i=0; i<2*nbDimancheTravailles[contrat_agent[k][1]][1]-1;i++){
-				    vars[i]=model.intVar(0,1,true);
-	                model.arithm(vars[i],"=",DeltaPlannifD[k][7*(p+i)+5][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(4))))]).post();
-					}
-				model.sum(vars,">=",nbDimancheTravailles[contrat_agent[k][1]][1]-nbDimancheTravailles[contrat_agent[k][1]][0]).post();
+			IntVar[] vars = new IntVar[(int)(H/7)];
+			for (int p=0; p<(int)(H/7);p++){
+				 vars[p]=model.intVar(0,1,true);
+	             model.arithm(vars[p],"=",DeltaPlannifD[k][7*p+6][indexage(tabToSet(new ArrayList<Integer>(Arrays.asList(0,1,2,3))))]).post();
 				}
-			}
-
+			model.sum(vars,"<=",(int)(Math.floor(nbDimancheTravailles[contrat_agent[k][1]][0]/nbDimancheTravailles[contrat_agent[k][1]][1]))).post();
+		}
+		
 		
 		// Contrainte 9.3
 		for(int k=0; k<nbAgents; k++) {
