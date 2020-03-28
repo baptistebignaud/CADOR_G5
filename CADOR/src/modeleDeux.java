@@ -152,7 +152,7 @@ public class modeleDeux {
 		
 		// Renvoie le nombre de personnes à chaque type de contrat
 
-		int[] contrats = {9,0,1,0,0,0,4};
+		int[] contrats = {9,0,2,0,0,2,0};
 		int nbAgents = 0;
 		for (int val:contrats) {
 			nbAgents += val;
@@ -161,16 +161,16 @@ public class modeleDeux {
 		// Renvoie le type de contrat d'un agent k
 		
 		int[][] contrat_agent = {
-				{0,6},
+				{0,5},
 				{1,0},
 				{2,0},
 				{3,0},
 				{4,0},
-				{5,6},
+				{5,0},
 				{6,2},
 				{7,0},
-				{8,6},
-				{9,6},
+				{8,5},
+				{9,2},
 				{10,0},
 				{11,0},
 				{12,0},
